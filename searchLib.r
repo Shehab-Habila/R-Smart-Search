@@ -15,6 +15,7 @@ split_strings_into_letters <- function(string_to_split) {
   
   # Define the empty output variable
   letters_of_the_string   <- list(NULL)
+  
   # Split the string into words
   words_of_the_string     <- unlist(strsplit(string_to_split, " "))
   
@@ -28,6 +29,55 @@ split_strings_into_letters <- function(string_to_split) {
   
   # Return the output variable
   return(letters_of_the_string[2:length(letters_of_the_string)])
+  
+}
+
+match_word_to_word <- function(wanted_word, ref_word) {
+  
+  # Set up the default output
+  match_accuracy <- NULL
+  
+  # Check if the two words are completely symmetrical
+  if ( wanted_word == ref_word ) {
+    
+    match_accuracy <- 1
+    
+  } else { # Check if they are alike
+    
+    wanted_word__in_letters <- unlist(strsplit(wanted_word, NULL))
+    ref_word__in_letters    <- unlist(strsplit(ref_word, NULL))
+    
+    # The equality in number of characters in the two words is assumed
+    if (length(wanted_word__in_letters) == length(ref_word__in_letters)) {
+      
+      # Start the actual comparison between every two corresponding characters
+      rounds_no <- length(wanted_word__in_letters)
+      successful_rounds <- 0
+      for (round_counter in 1:rounds_no) {
+        
+        # Compare
+        if ( wanted_word__in_letters[round_counter] == ref_word__in_letters[round_counter] ) {
+          successful_rounds <- successful_rounds + 1
+        }
+        
+      }
+      
+      # Assess the results
+      if ( rounds_no < 4 ) {
+        if ( successful_rounds >= (rounds_no - 1) ){
+          match_accuracy <- successful_rounds / rounds_no
+        }
+      } else {
+        if ( successful_rounds >= (rounds_no - 2) ){
+          match_accuracy <- successful_rounds / rounds_no
+        }
+      }
+      
+    }
+    
+  } # End of matching
+  
+  return(match_accuracy)
   
 }
 
@@ -65,68 +115,22 @@ start_search <- function (string_to_find, string_or_vector_to_find_in) {
         current_reference_word <- current_reference_item__in_words[reference_words_index_counter]
         
         # Start the actual comparing of a word to word
-        matched <- FALSE
-        
-        # Check if the two words are symmetrical
-        if ( current_wanted_word == current_reference_word ) {
-          matched <- TRUE
-          # Setting the matches parameters up
-          wanted_word_index <- wanted_index_counter
-          ref_word_index    <- reference_words_index_counter
-          ref_item_index    <- reference_index_counter
-          letters_matched_percentage <- 1
-        }
-        
-        else {
-          
-          # Get the two words in letters
-          current_wanted_word__in_letters     <- unlist(string_to_find__in_letters[wanted_index_counter])
-          current_reference_word__in_letters  <- unlist(strsplit(current_reference_word, NULL))
-          
-          # Number of characters in the two words is assumed to be the same
-          if ( length(current_wanted_word__in_letters) == length(current_reference_word__in_letters) ) {
-
-            # Start smart comparing by letter
-            num_matched_letters <- 0
-            letters_counter     <- 1
-            for ( letters_counter in 1:length(current_wanted_word__in_letters) ) {
-              # Compare
-              if ( current_wanted_word__in_letters[letters_counter] == current_reference_word__in_letters[letters_counter] ) {
-                num_matched_letters <- num_matched_letters + 1
-              }
-            }
-            
-            # Results of comparison
-            if ( length(current_wanted_word__in_letters) < 4 ) {
-              if ( num_matched_letters >= length(current_wanted_word__in_letters)-1 ) {
-                matched <- TRUE
-                # Setting the matches parameters up
-                wanted_word_index           <- wanted_index_counter
-                ref_word_index              <- reference_words_index_counter
-                ref_item_index              <- reference_index_counter
-                letters_matched_percentage  <- num_matched_letters/length(current_wanted_word__in_letters)
-              }
-            }
-            else {
-              if ( num_matched_letters >= length(current_wanted_word__in_letters)-2 ) {
-                matched <- TRUE
-                # Setting the matches parameters up
-                wanted_word_index           <- wanted_index_counter
-                ref_word_index              <- reference_words_index_counter
-                ref_item_index              <- reference_index_counter
-                letters_matched_percentage  <- num_matched_letters/length(current_wanted_word__in_letters)
-              }
-            }
-            
-          }
-        }
+        matched <- match_word_to_word(current_wanted_word, current_reference_word)
         
         
         # Check if its already matched, no need to continue with this wanted word
-        if (isTRUE(matched) == TRUE) {
-          current_match_parameters  <- list(c(wanted_word_index, ref_word_index, ref_item_index, letters_matched_percentage))
+        if (is.null(matched) == FALSE) {
+          
+          wanted_word_index <- wanted_index_counter
+          ref_word_index    <- reference_words_index_counter
+          ref_item_index    <- reference_index_counter
+          
+          current_match_parameters  <- list(c(wanted_word_index, ref_item_index, ref_word_index, matched))
           matches_parameters        <- append(matches_parameters, current_match_parameters)
-          break
+          
+          # Will not break, to return if a word were found more than one time
+          # break
+          
         }
         
       } # End of comparing one wanted word with all words of one reference string
@@ -160,6 +164,7 @@ smart_search <- function (string_to_find, string_or_vector_to_find_in, min_word_
     return("ERROR: string_or_vector_to_find_in must be numeric.")
   }
   
+  
   num_words_to_find <- length(unlist(strsplit(string_to_find, " ")))
   
   # Get the matches
@@ -172,21 +177,21 @@ smart_search <- function (string_to_find, string_or_vector_to_find_in, min_word_
   }
   
   
-  # Extract and calculate the score for all matches
+  # Extract and calculate the score for all matched reference items
   matched_ref_indices <- NULL
   final_scores <- list(NULL)
   
   # Extract the parameters for each reference item and calculate the score
   current_reference <- 1
   for ( current_reference in 1:length(string_or_vector_to_find_in) ) {
-
+    
     current_score <- 0
+    
     current_item_matches <- 0
     
     # 4 checks will be done for every item: number of matches, unique matches percentage, successive or not, accuracy of the match
     # Resitting all variables for each reference item
     words_matches   <- NULL
-    num_matches     <- 0
     unique_matches  <- NULL
     num_unique_matches <- 0
     matches_percent <- 0
@@ -196,7 +201,8 @@ smart_search <- function (string_to_find, string_or_vector_to_find_in, min_word_
     
     for (matches_counter in 1:total_matches) {
       
-      matched_ref_item_index <- unlist(matches[matches_counter])[3]
+      matched_ref_item_index <- unlist(matches[matches_counter])[2]
+      
       if ( current_reference == matched_ref_item_index ) {
         # Add to matches
         words_matches <- c(words_matches, unlist(matches[matches_counter])[1])
@@ -204,7 +210,9 @@ smart_search <- function (string_to_find, string_or_vector_to_find_in, min_word_
         total_accuracies <- total_accuracies + unlist(matches[matches_counter])[4]
         # Check if they are successives [not implemented now]
       }
+      
     }
+    
     num_matches         <- length(words_matches)
     unique_matches      <- unique(words_matches)
     num_unique_matches  <- length(unique_matches)
@@ -212,7 +220,7 @@ smart_search <- function (string_to_find, string_or_vector_to_find_in, min_word_
     
     # Calculate the score
     if ( num_unique_matches >= min_word_matches*num_words_to_find ) {
-      current_score <- num_unique_matches + (num_matches/num_words_to_find) + (num_matches/length(unlist(strsplit(string_or_vector_to_find_in[current_reference], " ")))) + mean_accuracies
+      current_score <- num_unique_matches + (num_matches/num_unique_matches) + (num_matches/length(unlist(strsplit(string_or_vector_to_find_in[current_reference], " ")))) + mean_accuracies
     }
     
     # Add to final scores
@@ -223,7 +231,12 @@ smart_search <- function (string_to_find, string_or_vector_to_find_in, min_word_
     
   }
   
+  
   # Start sorting the matched reference items according to the score
+  if ( length(final_scores) == 1 ) { # Contains only the NULL placeholder
+    return(NULL)
+  }
+  
   final_scores  <- final_scores[2:length(final_scores)]
   names(final_scores) <- matched_ref_indices
   final_scores  <- as.list(sort(unlist(final_scores), decreasing = TRUE))
@@ -243,4 +256,5 @@ smart_search <- function (string_to_find, string_or_vector_to_find_in, min_word_
   return(output)
   
 }
+
 
