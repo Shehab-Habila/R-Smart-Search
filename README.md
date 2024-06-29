@@ -1,4 +1,4 @@
-SmartSearchR: Advanced Text Search Library for R
+R-Smart-Search: Advanced Text Search Library for R
 _____________________________________________________
 
 Overview
