@@ -21,14 +21,18 @@ The main function, `smart_search()`, takes the following inputs:
   - `min_word_matches`: The minimum percentage of words that must match to consider a result as valid (default is 0.3 or 30%).
 
 **Supporting Functions:**
-1. `split_strings_into_letters(string_to_split)`
+1. `split_words_into_letters_and_remove_special`
+   - Splits a word into letters and removes special characters.
+   - Input: A word as a string.
+   - Output: A vector of letters without special characters.
+2. `split_strings_into_letters(string_to_split)`
    - Splits a given string into a list of letters for each word.
    - Example: "hello world" becomes `list(c("h", "e", "l", "l", "o"), c("w", "o", "r", "l", "d"))`.
-2. `match_word_to_word(wanted_word, ref_word)`
+3. `match_word_to_word(wanted_word, ref_word)`
    - Compares two words to determine their match accuracy.
    - If the words are identical, the match accuracy is 1.
    - If the words are similar in length, it calculates the percentage of matching characters, considering near matches based on the word length.
-3. `start_search(string_to_find, string_or_vector_to_find_in)`
+4. `start_search(string_to_find, string_or_vector_to_find_in)`
    - Iterates through each reference text to find matches for each word in the target string.
    - Uses `split_strings_into_letters()` and `match_word_to_word()` to compare words.
    - Returns a list of matches with details like the indices of the matched words and their match accuracy.
@@ -58,7 +62,7 @@ _____________________________________________________
 
 **Example Usage:**
 ```r
-results <- smart_search("hello world", c("hello", "hi there", "hello world", "world hello"), min_word_matches = 0.5)
+results <- smart_search("hello world!", c("hello", "hi there", "hello world", "world hello"), min_word_matches = 0.5)
 print(results)
 ```
 This example will search for the string "hello world" in the provided vector of strings and return the matches that meet the minimum word match threshold, sorted by their match accuracy.
