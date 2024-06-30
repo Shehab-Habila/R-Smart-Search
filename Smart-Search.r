@@ -96,8 +96,8 @@ match_word_to_word <- function(wanted_word, ref_word) {
 start_search <- function (string_to_find, string_or_vector_to_find_in) {
   
   # Get the wanted string in words/letters
-  string_to_find__in_words    <- unlist(strsplit(string_to_find, " "))
-  string_to_find__in_letters  <- split_strings_into_letters(string_to_find)
+  string_to_find__in_words  <- unlist(strsplit(string_to_find, " "))
+  num_wanted_words          <- length(string_to_find__in_words)
   
   # Set the output variable of the list [Will be used to sort the matched reference elements according to accuracy of the match]
   # its format will be: [vector for each match]
@@ -111,7 +111,7 @@ start_search <- function (string_to_find, string_or_vector_to_find_in) {
     current_reference_item <- string_or_vector_to_find_in[reference_index_counter]
     # Start a loop to search for every word in the wanted string
     wanted_index_counter <- 1
-    for ( wanted_index_counter in 1:length(string_to_find__in_letters) ) {
+    for ( wanted_index_counter in 1:num_wanted_words ) {
       
       # Getting the current wanted word
       current_wanted_word <- string_to_find__in_words[wanted_index_counter]
@@ -261,7 +261,10 @@ smart_search <- function (string_to_find, string_or_vector_to_find_in, min_word_
     
     # Add to final scores
     if ( current_score > 0 ) {
-      final_scores        <- append(final_scores, current_score)
+      final_scores  <- append(final_scores, current_score)
+    }
+    if ( current_score == 0 ) { 
+      matched_ref_items_indices <- matched_ref_items_indices[-match(current_reference_index, matched_ref_items_indices)]
     }
     
   }
