@@ -22,6 +22,7 @@
 
 
 
+# Helper function to split words into letters and remove special characters
 split_words_into_letters_and_remove_special <- function(word) {
   
   # Split into letters
@@ -35,6 +36,7 @@ split_words_into_letters_and_remove_special <- function(word) {
 }
 
 
+# Helper function to split strings into letters
 split_strings_into_letters <- function(string_to_split) {
   
   # Define the empty output variable
@@ -57,6 +59,7 @@ split_strings_into_letters <- function(string_to_split) {
 }
 
 
+# Function to match two words and calculate match accuracy
 match_word_to_word <- function(wanted_word, ref_word) {
   
   # Set up the default output
@@ -107,6 +110,7 @@ match_word_to_word <- function(wanted_word, ref_word) {
 }
 
 
+# Function to start the search process
 start_search <- function (string_to_find, string_or_vector_to_find_in) {
   
   # Get the wanted string in words/letters
@@ -176,10 +180,10 @@ start_search <- function (string_to_find, string_or_vector_to_find_in) {
 }
 
 
-# The main function
+# Main function to perform smart search
 smart_search <- function (string_to_find, string_or_vector_to_find_in, min_word_matches = 0.3) {
   
-  # Do some validations
+  # Doing some validations
   if ( is.character(string_to_find) == FALSE | string_to_find == "" ) {
     return("ERROR: string_to_find must be a character.")
   }
