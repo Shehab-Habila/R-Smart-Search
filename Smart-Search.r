@@ -22,6 +22,19 @@
 
 
 
+split_words_into_letters_and_remove_special <- function(word) {
+  
+  # Split into letters
+  word__in_letters <- unlist(strsplit(word, NULL))
+  # Remove special characters
+  special <- c("`", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "_", "-", "=", "+", "'", '"', "?", ">", "<", ":", ",", "{", "}", ";", "[", "]", " ")
+  word_clean <- word__in_letters[! word__in_letters%in% special]
+  
+  # Return the clean output in letters
+  return(word_clean)
+}
+
+
 split_strings_into_letters <- function(string_to_split) {
   
   # Define the empty output variable
@@ -33,7 +46,7 @@ split_strings_into_letters <- function(string_to_split) {
   # Split every word into letters
   for (current_word in words_of_the_string) {
     
-    letters_vector <- list(unlist(strsplit(current_word, NULL)))
+    letters_vector <- list( split_words_into_letters_and_remove_special(current_word) )
     letters_of_the_string <- append(letters_of_the_string, letters_vector)
     
   }
@@ -42,6 +55,7 @@ split_strings_into_letters <- function(string_to_split) {
   return(letters_of_the_string[2:length(letters_of_the_string)])
   
 }
+
 
 match_word_to_word <- function(wanted_word, ref_word) {
   
@@ -55,8 +69,8 @@ match_word_to_word <- function(wanted_word, ref_word) {
     
   } else { # Check if they are alike
     
-    wanted_word__in_letters <- unlist(strsplit(wanted_word, NULL))
-    ref_word__in_letters    <- unlist(strsplit(ref_word, NULL))
+    wanted_word__in_letters <- split_words_into_letters_and_remove_special(wanted_word)
+    ref_word__in_letters    <- split_words_into_letters_and_remove_special(ref_word)
     
     # The equality in number of characters in the two words is assumed
     if (length(wanted_word__in_letters) == length(ref_word__in_letters)) {
@@ -165,7 +179,7 @@ start_search <- function (string_to_find, string_or_vector_to_find_in) {
 # The main function
 smart_search <- function (string_to_find, string_or_vector_to_find_in, min_word_matches = 0.3) {
   
-  # Do some check ups
+  # Do some validations
   if ( is.character(string_to_find) == FALSE | string_to_find == "" ) {
     return("ERROR: string_to_find must be a character.")
   }
