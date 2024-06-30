@@ -43,7 +43,6 @@ split_strings_into_letters <- function(string_to_split) {
   
 }
 
-
 match_word_to_word <- function(wanted_word, ref_word) {
   
   # Set up the default output
@@ -163,7 +162,6 @@ start_search <- function (string_to_find, string_or_vector_to_find_in) {
 }
 
 
-
 # The main function
 smart_search <- function (string_to_find, string_or_vector_to_find_in, min_word_matches = 0.3) {
   
@@ -189,7 +187,7 @@ smart_search <- function (string_to_find, string_or_vector_to_find_in, min_word_
   }
   
   # Extract and calculate the score for all matched reference elements
-  total_matches  <- length(matches) # Getting the number of matches
+  total_matches <- length(matches) # Getting the number of matches
   # Remember: matches are returned in a list composed of vectors for every match
   #   Every vector contains c(wanted_word_index, ref_item_index, ref_word_index, match_accuracy)
   matched_ref_items_indices <- NULL
@@ -205,6 +203,7 @@ smart_search <- function (string_to_find, string_or_vector_to_find_in, min_word_
   # CALCULATE THE SCORES
   final_scores <- list(NULL)
   # Extract the parameters for each reference element and calculate the score
+  matched_ref_items_indices <- unique(matched_ref_items_indices)
   for ( current_reference_index in matched_ref_items_indices ) {
     
     # 4 checks will be done for every item: number of matches, unique matches percentage, successive or not, accuracy of the match
@@ -214,15 +213,18 @@ smart_search <- function (string_to_find, string_or_vector_to_find_in, min_word_
     words_matched     <- NULL
     total_accuracies  <- 0
     
+    matched_words_indices_in_ref_item <- NULL
+    
     for (matches_counter in 1:total_matches) {
       
       matched_ref_item_index <- unlist(matches[matches_counter])[2]
       if ( current_reference_index == matched_ref_item_index ) {
         # Add to matches
-        words_matched <- c(words_matched, unlist(matches[matches_counter])[1])
+        words_matched    <- c(words_matched, unlist(matches[matches_counter])[1])
         # Add to total accuracies
         total_accuracies <- total_accuracies + unlist(matches[matches_counter])[4]
         # Check if they are successives [not implemented yet]
+        matched_words_indices_in_ref_item <- c(matched_words_indices_in_ref_item, unlist(matches[matches_counter])[3])
       }
       
     }
@@ -233,11 +235,28 @@ smart_search <- function (string_to_find, string_or_vector_to_find_in, min_word_
     num_unique_matches  <- length(unique_matches)
     mean_accuracies     <- total_accuracies/num_matches
     
+    # Check if the matched words are successive in the matched reference element or not
+    num_successive_matches <- 0
+    if ( num_unique_matches > 1 ) {
+      for ( matched_word_counter in 1:(length(words_matched)-1) ) {
+        # Getting some parameters
+        current_word_index__in_wanted_string  <- words_matched[matched_word_counter]
+        current_word_index__in_ref_item       <- matched_words_indices_in_ref_item[matched_word_counter]
+        next_word_index__in_wanted_string     <- words_matched[matched_word_counter+1]
+        next_word_index__in_ref_item          <- matched_words_indices_in_ref_item[matched_word_counter+1]
+        # Calculating
+        if ( (next_word_index__in_wanted_string - current_word_index__in_wanted_string) == (next_word_index__in_ref_item - current_word_index__in_ref_item) ) {
+          num_successive_matches <- num_successive_matches + 1
+        }
+      } 
+    } # Getting the percentage of successive matches
+    percent_successive_matches <- num_successive_matches / (num_matches/2)
+    
     # Calculate the score
     current_score     <- 0 # Default
     num_words_to_find <- length(unlist(strsplit(string_to_find, " ")))
     if ( num_unique_matches >= min_word_matches*num_words_to_find ) {
-      current_score <- num_unique_matches + (num_matches/num_unique_matches) + (num_matches/length(unlist(strsplit(string_or_vector_to_find_in[current_reference_index], " ")))) + mean_accuracies
+      current_score <- num_unique_matches + (num_matches/num_unique_matches) + (num_matches/length(unlist(strsplit(string_or_vector_to_find_in[current_reference_index], " ")))) + mean_accuracies + percent_successive_matches
     }
     
     # Add to final scores
