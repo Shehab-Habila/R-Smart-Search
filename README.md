@@ -46,6 +46,7 @@ _____________________________________________________
      - Number of word matches.
      - Percentage of unique matches.
      - Mean accuracy of the matches.
+     - Order of the matched words in the reference string.
    - Scores are calculated only if the number of unique word matches meets the `min_word_matches` threshold.
 4. Sorting and Returning Results:
    - Sorts the reference texts based on their scores in descending order.
@@ -57,7 +58,7 @@ _____________________________________________________
 
 **Example Usage:**
 ```r
-results <- smart_search("hello world", c("hello", "world hello", "hi there", "hello world!"), min_word_matches = 0.5)
+results <- smart_search("hello world", c("hello", "hi there", "hello world", "world hello"), min_word_matches = 0.5)
 print(results)
 ```
 This example will search for the string "hello world" in the provided vector of strings and return the matches that meet the minimum word match threshold, sorted by their match accuracy.
