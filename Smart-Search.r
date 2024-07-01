@@ -327,7 +327,12 @@ smart_search <- function (string_to_find, string_or_vector_to_find_in, min_word_
     current_score     <- 0 # Default
     num_words_to_find <- length(unlist(strsplit(string_to_find, " ")))
     if ( num_unique_matches >= min_word_matches*num_words_to_find ) {
-      current_score <- num_unique_matches + (num_matches/num_unique_matches) + (num_matches/length(unlist(strsplit(string_or_vector_to_find_in[current_reference_index], " ")))) + mean_accuracies + percent_successive_matches
+      current_score <-  (num_unique_matches/num_words_to_find) +
+                        (num_matches/num_unique_matches) +
+                        (num_matches/length(unlist(strsplit(string_or_vector_to_find_in[current_reference_index], " ")))) + 
+                        (num_unique_matches/length(unlist(strsplit(string_or_vector_to_find_in[current_reference_index], " ")))) + 
+                        mean_accuracies + 
+                        percent_successive_matches
     }
     
     # Add to final scores
