@@ -124,4 +124,4 @@ Output:
 [[5]]
 [1] "6"  "5"                  "World, Hello!"
 ```
-This example will search for the string "hello world" in the provided vector of strings and return the matches that meet the minimum word match threshold, sorted by their match accuracy.
+This example will search for the string "Hello World, I'm New to You!" in the provided vector of strings and return the matches that meet the minimum word match threshold, sorted by their match accuracy.
