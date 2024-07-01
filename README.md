@@ -29,9 +29,9 @@ The main function, `smart_search()`, takes the following inputs:
    - Splits a given string into a list of letters for each word.
    - Example: "hello world" becomes `list(c("h", "e", "l", "l", "o"), c("w", "o", "r", "l", "d"))`.
 3. `match_word_to_word(wanted_word, ref_word)`
-   - Compares two words to determine their match accuracy.
-   - If the words are identical, the match accuracy is 1.
-   - If the words are similar in length, it calculates the percentage of matching characters, considering near matches based on the word length.
+   - Compares a target word (wanted_word) to a reference word (ref_word).
+   - Checks for exact matches and near matches (allowing for slight variations in letters number, order, or in the letters itself).
+   - Returns a match accuracy score between 0 and 1, indicating how similar the two words are.
 4. `start_search(string_to_find, string_or_vector_to_find_in)`
    - Iterates through each reference text to find matches for each word in the target string.
    - Uses `split_strings_into_letters()` and `match_word_to_word()` to compare words.
@@ -62,7 +62,9 @@ _____________________________________________________
 
 **Example Usage:**
 ```r
-results <- smart_search("hello world!", c("hello", "hi there", "hello world", "world hello"), min_word_matches = 0.5)
+results <- smart_search("Hello World, I'm New to You!",
+                        c("hello world, i am new to you!", "Hello, Wolrd!", "Hello", "helolo wordl", "Hello Worl! Iam New!"),
+                        min_word_matches = 0.3)
 print(results)
 ```
 This example will search for the string "hello world" in the provided vector of strings and return the matches that meet the minimum word match threshold, sorted by their match accuracy.
