@@ -67,43 +67,96 @@ match_word_to_word <- function(wanted_word, ref_word) {
   
   # Check if the two words are completely symmetrical
   if ( wanted_word == ref_word ) {
-    
     match_accuracy <- 1
-    
   } else { # Check if they are alike
     
     wanted_word__in_letters <- split_words_into_letters_and_remove_special(wanted_word)
     ref_word__in_letters    <- split_words_into_letters_and_remove_special(ref_word)
     
-    # The equality in number of characters in the two words is assumed
-    if (length(wanted_word__in_letters) == length(ref_word__in_letters)) {
-      
-      # Start the actual comparison between every two corresponding characters
-      rounds_no <- length(wanted_word__in_letters)
-      successful_rounds <- 0
-      for (round_counter in 1:rounds_no) {
-        
-        # Compare
-        if ( wanted_word__in_letters[round_counter] == ref_word__in_letters[round_counter] ) {
-          successful_rounds <- successful_rounds + 1
-        }
-        
+    # Equality in number of characters is no longer assumed
+    inaccuracy <- NULL
+    
+    # If the length of reference word is greater than the length of the wanted word
+    if ( length(ref_word__in_letters) %in% (length(wanted_word__in_letters) - 1):(length(wanted_word__in_letters) + 2) ) {
+      # Setting the default basic inaccuracy
+      if ( length(ref_word__in_letters) > length(wanted_word__in_letters) ) {
+        inaccuracy <- ( length(ref_word__in_letters) - length(wanted_word__in_letters) ) / 2
+      }
+      if ( length(ref_word__in_letters) < length(wanted_word__in_letters) ) {
+        inaccuracy <- ( length(wanted_word__in_letters) - length(ref_word__in_letters) ) / 2
+      }
+      if ( length(ref_word__in_letters) == length(wanted_word__in_letters) ) {
+        inaccuracy <- 0
       }
       
-      # Assess the results
-      if ( rounds_no < 4 ) {
-        if ( successful_rounds >= (rounds_no - 1) ){
-          match_accuracy <- successful_rounds / rounds_no
+      # Match every character in the wanted word with its corresponding in the reference one
+      ref_letter_counter <- 1
+      wanted_letter_counter <- 1
+      while ( wanted_letter_counter <= length(wanted_word__in_letters) ) {
+        if ( ref_word__in_letters[ref_letter_counter] == wanted_word__in_letters[wanted_letter_counter] ) {
+          ref_letter_counter <- ref_letter_counter + 1
         }
-      } else {
-        if ( successful_rounds >= (rounds_no - 2) ){
-          match_accuracy <- successful_rounds / rounds_no
+        else {
+          if ( wanted_letter_counter == length(wanted_word__in_letters) ) {
+            inaccuracy <- inaccuracy + 1
+          }
+          else {
+            # Check for alteration with the next char
+            if ( ref_letter_counter < length(ref_word__in_letters) ) {
+              if ( wanted_word__in_letters[wanted_letter_counter] == ref_word__in_letters[ref_letter_counter + 1] ) {
+                if ( wanted_word__in_letters[wanted_letter_counter + 1] == ref_word__in_letters[ref_letter_counter] ) {
+                  # There is alteration
+                  inaccuracy <- inaccuracy + 1
+                  # Skip the next letter because it is already checked
+                  ref_letter_counter <- ref_letter_counter + 2
+                  wanted_letter_counter <- wanted_letter_counter + 1
+                } else {
+                  # There is alteration, but there is a foreign char in between
+                  inaccuracy <- inaccuracy + 1
+                  ref_letter_counter <- ref_letter_counter + 2
+                }
+              } else { # There is no alteration or foreign char, two letters simply don't match
+                inaccuracy <- inaccuracy + 1
+                ref_letter_counter <- ref_letter_counter + 1
+              }
+            } else { # There is no alteration or foreign char, two letters simply don't match
+              inaccuracy <- inaccuracy + 1
+              ref_letter_counter <- ref_letter_counter + 1
+            }
+          }
         }
+        
+        if ( ref_letter_counter > length(ref_word__in_letters) ) { # You've checked all the letters in the ref word
+          break
+        }
+        
+        wanted_letter_counter <- wanted_letter_counter + 1
       }
       
+      # Calculating the final match accuracy
+      match_accuracy <- ( length(wanted_word__in_letters) - inaccuracy ) / length(wanted_word__in_letters)
+    }
+    
+    # If the length of the reference word is too smaller or too larger than the wanted word
+    else {
+      match_accuracy <- 0
+    }
+    
+    
+    # Assess findings
+    if ( length(wanted_word__in_letters) < 4 ) {
+      if ( match_accuracy < ( (length(wanted_word__in_letters) - 1) / length(wanted_word__in_letters) ) ) {
+        match_accuracy <- NULL
+      }
+    }
+    if ( length(wanted_word__in_letters) >= 4 ) {
+      if ( match_accuracy < ( (length(wanted_word__in_letters) - 2.5) / length(wanted_word__in_letters) ) ) {
+        match_accuracy <- NULL
+      }
     }
     
   } # End of matching
+  
   
   return(match_accuracy)
   
