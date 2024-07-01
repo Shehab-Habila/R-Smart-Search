@@ -99,10 +99,29 @@ _____________________________________________________
    - If the `match_accuracy` meets the threshold, it is returned. Otherwise, the function returns `NULL`.
 _____________________________________________________
 **Example Usage:**
+
+Input:
 ```r
 results <- smart_search("Hello World, I'm New to You!",
                         c("hello world, i am new to you!", "Hello, Wolrd!", "Hello!", "helolo wordl", "Hello Worl! Iam New!", "World, Hello!"),
                         min_word_matches = 0.3)
 print(results)
+```
+Output:
+```r
+[[1]]
+[1] "1"  "9.92936507936508"   "hello world, i am new to you!"
+
+[[2]]
+[1] "5"  "7.05"               "Hello Worl! Iam New!"
+
+[[3]]
+[1] "2"  "5.9"                "Hello, Wolrd!"
+
+[[4]]
+[1] "4"  "5.55"               "helolo wordl"
+
+[[5]]
+[1] "6"  "5"                  "World, Hello!"
 ```
 This example will search for the string "hello world" in the provided vector of strings and return the matches that meet the minimum word match threshold, sorted by their match accuracy.
