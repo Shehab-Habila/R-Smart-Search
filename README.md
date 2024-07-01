@@ -69,7 +69,7 @@ _____________________________________________________
 
 3. Character-wise Comparison:
    - If the words are not symmetrical, the function proceeds to compare the words at the character level.
-   - **Split into Characters**:
+   - Split into Characters:
      - Both `wanted_word` and `ref_word` are split into individual letters and cleaned of special characters using the `split_words_into_letters_and_remove_special()` function.
    - Check Length Difference:
      - If the length of `ref_word` is within ±1 to ±2 characters of `wanted_word`, the function proceeds to calculate the basic `inaccuracy`.
